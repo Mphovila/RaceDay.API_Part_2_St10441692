@@ -1,0 +1,66 @@
+﻿@model List<RaceDay.MVC.Controllers.CategoryViewModel>
+
+@{
+    ViewData["Title"] = "Manage Categories";
+}
+
+<div class="container mt-4">
+    <h2>Manage Categories</h2>
+    <p>View the categories available for your events.</p>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["Success"]
+        </div>
+    }
+
+    @if (ViewBag.Error != null)
+    {
+        <div class="alert alert-danger">
+            @ViewBag.Error
+        </div>
+    }
+
+    <p>
+        <a href="/Categories/Create" class="btn btn-primary">
+            Create Category
+        </a>
+        <a href="/Dashboard/Organiser" class="btn btn-secondary">
+            Back to Dashboard
+        </a>
+    </p>
+
+    @if (Model == null || !Model.Any())
+    {
+        <div class="alert alert-info">
+            No categories have been created yet.
+        </div>
+    }
+    else
+    {
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th>Event ID</th>
+                    <th>Distance (km)</th>
+                    <th>Entry Fee</th>
+                    <th>Maximum Participants</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var category in Model)
+                {
+                    <tr>
+                        <td>@category.CategoryName</td>
+                        <td>@category.EventId</td>
+                        <td>@category.Distance</td>
+                        <td>R @category.EntryFee</td>
+                        <td>@category.MaximumParticipants</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>

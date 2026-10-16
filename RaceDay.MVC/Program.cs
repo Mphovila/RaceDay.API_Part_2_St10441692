@@ -1,23 +1,48 @@
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Add MVC services
+builder.Services.AddControllersWithViews();
 
-builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+// Enable session storage
+builder.Services.AddDistributedMemoryCache();
+
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
+
+// Connect MVC to the RaceDay API
+builder.Services.AddHttpClient("RaceDayAPI", client =>
+{
+    client.BaseAddress = new Uri("http://localhost:5221/");
+});
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+// Configure the application
+if (!app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.UseExceptionHandler("/Home/Error");
+    app.UseHsts();
 }
 
 app.UseHttpsRedirection();
 
+app.UseStaticFiles();
+
+app.UseRouting();
+
+app.UseSession();
+
 app.UseAuthorization();
 
-app.MapControllers();
+// Set the default homepage
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();
+

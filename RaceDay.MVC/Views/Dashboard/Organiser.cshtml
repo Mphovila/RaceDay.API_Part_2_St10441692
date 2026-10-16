@@ -1,0 +1,180 @@
+﻿@{
+    ViewData["Title"] = "Organiser Dashboard";
+}
+
+<style>
+    body {
+        background: #f1f5f9;
+    }
+
+    .dashboard-header {
+        background: linear-gradient(135deg, #172554, #1e40af);
+        color: white;
+        padding: 35px;
+        border-radius: 14px;
+    }
+
+    .dashboard-card {
+        border: none;
+        border-radius: 14px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+        height: 100%;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+        .dashboard-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 9px 25px rgba(0,0,0,0.09);
+        }
+
+    .dashboard-icon {
+        font-size: 30px;
+        color: #2563eb;
+    }
+
+    .dashboard-link {
+        text-decoration: none;
+        color: inherit;
+        display: block;
+        height: 100%;
+    }
+
+        .dashboard-link:hover {
+            color: inherit;
+        }
+
+    .dashboard-action {
+        color: #2563eb;
+        font-weight: 600;
+        margin-top: 15px;
+        display: inline-block;
+    }
+
+    .account-card {
+        background: #fff;
+    }
+</style>
+
+<div class="container mt-4 mb-5">
+
+    <div class="dashboard-header mb-4">
+        <h2 class="fw-bold">Welcome, @ViewBag.FirstName!</h2>
+
+        <p class="mb-0">
+            Manage your RaceDay events and keep everything
+            running smoothly.
+        </p>
+
+        <span class="badge bg-info text-dark mt-3">
+            Organiser
+        </span>
+    </div>
+
+    <h4 class="fw-bold mb-3">Organiser Dashboard</h4>
+
+    <div class="row g-4">
+
+        <!-- Manage Events -->
+        <div class="col-md-6 col-lg-4">
+            <a href="/Events/Index" class="dashboard-link">
+                <div class="card dashboard-card p-4">
+                    <div class="dashboard-icon mb-3">📅</div>
+                    <h5 class="fw-bold">Manage Events</h5>
+                    <p class="text-muted">
+                        Create, update, view and manage RaceDay events.
+                    </p>
+                    <span class="dashboard-action">
+                        Open Event Management →
+                    </span>
+                </div>
+            </a>
+        </div>
+
+        <!-- Manage Categories -->
+        <div class="col-md-6 col-lg-4">
+            <a href="/Categories/Index" class="dashboard-link">
+                <div class="card dashboard-card p-4">
+                    <div class="dashboard-icon mb-3">📂</div>
+                    <h5 class="fw-bold">Manage Categories</h5>
+                    <p class="text-muted">
+                        Create and view event categories and participant divisions.
+                    </p>
+                    <span class="dashboard-action">
+                        Open Categories →
+                    </span>
+                </div>
+            </a>
+        </div>
+
+        <!-- Enrolments -->
+        <div class="col-md-6 col-lg-4">
+            <a href="/Enrolments/Index" class="dashboard-link">
+                <div class="card dashboard-card p-4">
+                    <div class="dashboard-icon mb-3">📝</div>
+                    <h5 class="fw-bold">Enrolments</h5>
+                    <p class="text-muted">
+                        Review participant enrolments and event registrations.
+                    </p>
+                    <span class="dashboard-action">
+                        View Enrolments →
+                    </span>
+                </div>
+            </a>
+        </div>
+
+        <!-- Results -->
+        <div class="col-md-6 col-lg-4">
+            <a href="/Results/Index" class="dashboard-link">
+                <div class="card dashboard-card p-4">
+                    <div class="dashboard-icon mb-3">🏆</div>
+                    <h5 class="fw-bold">Manage Results</h5>
+                    <p class="text-muted">
+                        Record and manage race results.
+                    </p>
+                    <span class="dashboard-action">
+                        Open Results →
+                    </span>
+                </div>
+            </a>
+        </div>
+
+        <!-- Account Details -->
+        <div class="col-md-6 col-lg-4">
+            <div class="card dashboard-card account-card p-4">
+                <div class="dashboard-icon mb-3">👤</div>
+                <h5 class="fw-bold">Account Details</h5>
+                <p class="text-muted">
+                    Your organiser account information.
+                </p>
+
+                <p class="mb-1">
+                    <strong>Name:</strong>
+                    @ViewBag.FirstName @ViewBag.LastName
+                </p>
+
+                <p class="mb-0">
+                    <strong>Email:</strong>
+                    @ViewBag.Email
+                </p>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="d-flex flex-wrap gap-2 mt-4">
+
+        <a href="/" class="btn btn-outline-primary">
+            View Website
+        </a>
+
+        <form action="/Account/Logout" method="post">
+            @Html.AntiForgeryToken()
+
+            <button type="submit" class="btn btn-outline-danger">
+                Logout
+            </button>
+        </form>
+
+    </div>
+
+</div>

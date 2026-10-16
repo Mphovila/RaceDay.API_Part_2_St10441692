@@ -1,0 +1,198 @@
+﻿@model RaceDay.MVC.Controllers.LoginViewModel
+
+@{
+    ViewData["Title"] = "Login";
+}
+
+<style>
+    body {
+        background: #f1f5f9;
+        font-family: Arial, sans-serif;
+    }
+
+    .login-wrapper {
+        max-width: 500px;
+        margin: 65px auto;
+        padding: 0 15px;
+    }
+
+    .login-card {
+        background: #ffffff;
+        border: none;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+    }
+
+    .login-header {
+        background: #172554;
+        color: white;
+        text-align: center;
+        padding: 40px 20px;
+    }
+
+        .login-header h1 {
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .login-header h3 {
+            font-size: 22px;
+            margin-bottom: 8px;
+        }
+
+        .login-header p {
+            color: #cbd5e1;
+            margin: 0;
+        }
+
+    .login-body {
+        padding: 35px;
+    }
+
+    .form-label {
+        color: #172554;
+        font-weight: 600;
+        margin-bottom: 7px;
+    }
+
+    .form-control {
+        padding: 13px;
+        border-radius: 8px;
+        border: 1px solid #cbd5e1;
+    }
+
+        .form-control:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+        }
+
+    .login-button {
+        background: #2563eb;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 13px;
+        width: 100%;
+        font-size: 16px;
+        font-weight: bold;
+        transition: background 0.2s;
+    }
+
+        .login-button:hover {
+            background: #1d4ed8;
+        }
+
+    .login-links {
+        text-align: center;
+        margin-top: 25px;
+    }
+
+        .login-links a {
+            color: #2563eb;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+            .login-links a:hover {
+                text-decoration: underline;
+            }
+
+    .back-link {
+        display: inline-block;
+        margin-top: 12px;
+        color: #64748b !important;
+    }
+
+    @@media (max-width: 576px) {
+        .login-body {
+            padding: 25px 20px;
+        }
+
+        .login-wrapper {
+            margin: 30px auto;
+        }
+    }
+</style>
+
+<div class="login-wrapper">
+    <div class="login-card">
+
+        <div class="login-header">
+            <h1>RaceDay</h1>
+            <h3>Welcome Back</h3>
+            <p>Sign in to continue your RaceDay journey.</p>
+        </div>
+
+        <div class="login-body">
+
+            @if (ViewBag.Error != null)
+            {
+                <div class="alert alert-danger">
+                    @ViewBag.Error
+                </div>
+            }
+
+            @if (TempData["Success"] != null)
+            {
+                <div class="alert alert-success">
+                    @TempData["Success"]
+                </div>
+            }
+
+            <form action="/Account/Login" method="post">
+
+                @Html.AntiForgeryToken()
+
+                <div class="mb-3">
+                    <label for="Email" class="form-label">
+                        Email Address
+                    </label>
+
+                    <input id="Email"
+                           name="Email"
+                           type="email"
+                           class="form-control"
+                           placeholder="Enter your email address"
+                           value="@Model?.Email"
+                           required />
+                </div>
+
+                <div class="mb-4">
+                    <label for="Password" class="form-label">
+                        Password
+                    </label>
+
+                    <input id="Password"
+                           name="Password"
+                           type="password"
+                           class="form-control"
+                           placeholder="Enter your password"
+                           required />
+                </div>
+
+                <button type="submit" class="login-button">
+                    Sign In
+                </button>
+
+            </form>
+
+            <div class="login-links">
+
+                <p>
+                    Don't have an account?
+                    <a href="/Account/Register">Create Account</a>
+                </p>
+
+                <a href="/" class="back-link">
+                    ← Back to Home
+                </a>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+

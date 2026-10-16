@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RaceDay.API.Data;
+using RaceDay.API.Models;
 
 namespace RaceDay.API.Controllers
 {
@@ -24,6 +25,7 @@ namespace RaceDay.API.Controllers
                 .Select(e => new
                 {
                     e.EventId,
+                    e.OrganiserId,
                     e.EventName,
                     e.Description,
                     e.EventType,
@@ -36,41 +38,57 @@ namespace RaceDay.API.Controllers
             return Ok(events);
         }
 
+        // GET: api/Events/1
+        [HttpGet("{id:int}")]
+        public async Task<IActionResult> GetEvent(int id)
+        {
+            var eventItem = await _context.Events
+                .Where(e => e.EventId == id)
+                .Select(e => new
+                {
+                    e.EventId,
+                    e.OrganiserId,
+                    e.EventName,
+                    e.Description,
+                    e.EventType,
+                    e.EventDate,
+                    e.Location,
+                    e.EntryFee
+                })
+                .FirstOrDefaultAsync();
+
+            if (eventItem == null)
+                return NotFound("Event not found.");
+
+            return Ok(eventItem);
+        }
+
         // POST: api/Events
         [HttpPost]
         public async Task<IActionResult> CreateEvent(
             [FromBody] CreateEventRequest request)
         {
-            if (string.IsNullOrWhiteSpace(request.EventName) ||
-                string.IsNullOrWhiteSpace(request.EventType) ||
-                string.IsNullOrWhiteSpace(request.Location))
+            if (!IsValid(request.EventName, request.EventType,
+                    request.Location, request.EntryFee))
             {
                 return BadRequest(
-                    "Event name, event type and location are required.");
-            }
-
-            if (request.EntryFee < 0)
-            {
-                return BadRequest("Entry fee cannot be negative.");
+                    "Please provide valid event details.");
             }
 
             var organiserExists = await _context.Users
                 .AnyAsync(u => u.UserId == request.OrganiserId);
 
             if (!organiserExists)
-            {
-                return BadRequest(
-                    "The specified organiser does not exist.");
-            }
+                return BadRequest("The specified organiser does not exist.");
 
-            var newEvent = new RaceDay.API.Models.Event
+            var newEvent = new Event
             {
                 OrganiserId = request.OrganiserId,
-                EventName = request.EventName,
+                EventName = request.EventName.Trim(),
                 Description = request.Description,
-                EventType = request.EventType,
+                EventType = request.EventType.Trim(),
                 EventDate = request.EventDate,
-                Location = request.Location,
+                Location = request.Location.Trim(),
                 EntryFee = request.EntryFee
             };
 
@@ -78,18 +96,83 @@ namespace RaceDay.API.Controllers
             await _context.SaveChangesAsync();
 
             return CreatedAtAction(
-                nameof(GetEvents),
+                nameof(GetEvent),
                 new { id = newEvent.EventId },
-                new
-                {
-                    newEvent.EventId,
-                    newEvent.EventName,
-                    newEvent.Description,
-                    newEvent.EventType,
-                    newEvent.EventDate,
-                    newEvent.Location,
-                    newEvent.EntryFee
-                });
+                newEvent);
+        }
+
+        // PUT: api/Events/1
+        [HttpPut("{id:int}")]
+        public async Task<IActionResult> UpdateEvent(
+            int id,
+            [FromBody] UpdateEventRequest request)
+        {
+            var eventItem = await _context.Events
+                .FirstOrDefaultAsync(e => e.EventId == id);
+
+            if (eventItem == null)
+                return NotFound("Event not found.");
+
+            if (eventItem.OrganiserId != request.OrganiserId)
+                return Forbid();
+
+            if (!IsValid(request.EventName, request.EventType,
+                    request.Location, request.EntryFee))
+            {
+                return BadRequest(
+                    "Please provide valid event details.");
+            }
+
+            eventItem.EventName = request.EventName.Trim();
+            eventItem.Description = request.Description;
+            eventItem.EventType = request.EventType.Trim();
+            eventItem.EventDate = request.EventDate;
+            eventItem.Location = request.Location.Trim();
+            eventItem.EntryFee = request.EntryFee;
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new
+            {
+                message = "Event updated successfully.",
+                eventItem.EventId
+            });
+        }
+
+        // DELETE: api/Events/1?organiserId=1
+        [HttpDelete("{id:int}")]
+        public async Task<IActionResult> DeleteEvent(
+            int id,
+            [FromQuery] int organiserId)
+        {
+            var eventItem = await _context.Events
+                .FirstOrDefaultAsync(e => e.EventId == id);
+
+            if (eventItem == null)
+                return NotFound("Event not found.");
+
+            if (eventItem.OrganiserId != organiserId)
+                return Forbid();
+
+            _context.Events.Remove(eventItem);
+            await _context.SaveChangesAsync();
+
+            return Ok(new
+            {
+                message = "Event deleted successfully."
+            });
+        }
+
+        private static bool IsValid(
+            string? eventName,
+            string? eventType,
+            string? location,
+            decimal entryFee)
+        {
+            return !string.IsNullOrWhiteSpace(eventName)
+                && !string.IsNullOrWhiteSpace(eventType)
+                && !string.IsNullOrWhiteSpace(location)
+                && entryFee >= 0;
         }
     }
 
@@ -103,5 +186,15 @@ namespace RaceDay.API.Controllers
         public string Location { get; set; } = string.Empty;
         public decimal EntryFee { get; set; }
     }
-}
 
+    public class UpdateEventRequest
+    {
+        public int OrganiserId { get; set; }
+        public string EventName { get; set; } = string.Empty;
+        public string? Description { get; set; }
+        public string EventType { get; set; } = string.Empty;
+        public DateTime EventDate { get; set; }
+        public string Location { get; set; } = string.Empty;
+        public decimal EntryFee { get; set; }
+    }
+}

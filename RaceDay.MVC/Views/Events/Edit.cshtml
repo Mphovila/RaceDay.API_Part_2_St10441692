@@ -1,0 +1,105 @@
+﻿@model RaceDay.MVC.Controllers.EventViewModel
+
+@{
+    ViewData["Title"] = "Edit Event";
+}
+
+<style>
+    body {
+        background: #f4f6fb;
+    }
+
+    .form-container {
+        max-width: 650px;
+        margin: 40px auto;
+        padding: 30px;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0,0,0,.06);
+    }
+
+    h1 {
+        color: #172554;
+    }
+
+    label {
+        display: block;
+        margin-top: 16px;
+        margin-bottom: 7px;
+        font-weight: 600;
+        color: #334155;
+    }
+
+    input, textarea, select {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        box-sizing: border-box;
+    }
+
+    textarea {
+        min-height: 100px;
+    }
+
+    .btn-main {
+        background: #2563eb;
+        color: white;
+        border: 0;
+        padding: 12px 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        margin-top: 22px;
+    }
+
+    .error {
+        background: #fee2e2;
+        color: #991b1b;
+        padding: 12px;
+        border-radius: 8px;
+    }
+</style>
+
+<div class="form-container">
+    <h1>Edit Event</h1>
+    <p>Update your event information.</p>
+
+    @if (ViewBag.Error != null)
+    {
+        <div class="error">@ViewBag.Error</div>
+    }
+
+    <form action="/Events/Edit" method="post">
+        @Html.AntiForgeryToken()
+
+        <input asp-for="EventId" type="hidden" />
+
+        <label>Event Name</label>
+        <input asp-for="EventName" required />
+
+        <label>Description</label>
+        <textarea asp-for="Description"></textarea>
+
+        <label>Event Type</label>
+        <select asp-for="EventType" required>
+            <option value="Running">Running</option>
+            <option value="Walking">Walking</option>
+            <option value="Cycling">Cycling</option>
+            <option value="Swimming">Swimming</option>
+            <option value="Other">Other</option>
+        </select>
+
+        <label>Event Date and Time</label>
+        <input asp-for="EventDate" type="datetime-local"
+               value="@Model.EventDate.ToString("yyyy-MM-ddTHH:mm")" required />
+
+        <label>Location</label>
+        <input asp-for="Location" required />
+
+        <label>Entry Fee (R)</label>
+        <input asp-for="EntryFee" type="number" min="0" step="0.01" required />
+
+        <button type="submit" class="btn-main">Save Changes</button>
+        <a href="/Events/Index" style="margin-left:12px;">Cancel</a>
+    </form>
+</div>

@@ -1,0 +1,107 @@
+﻿@{
+    ViewData["Title"] = "Participant Dashboard";
+}
+
+<style>
+    body {
+        background: #f1f5f9;
+    }
+
+    .dashboard-header {
+        background: #172554;
+        color: white;
+        padding: 35px;
+        border-radius: 14px;
+    }
+
+    .dashboard-card {
+        border: none;
+        border-radius: 14px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+        height: 100%;
+    }
+
+    .dashboard-icon {
+        font-size: 30px;
+        color: #2563eb;
+    }
+</style>
+
+<div class="container mt-4 mb-5">
+
+    <div class="dashboard-header mb-4">
+        <h2 class="fw-bold">Welcome, @ViewBag.FirstName!</h2>
+        <p class="mb-0">
+            Your RaceDay journey starts here. Discover events,
+            challenge yourself and track your progress.
+        </p>
+        <span class="badge bg-primary mt-3">Participant</span>
+    </div>
+
+    <h4 class="fw-bold mb-3">Your Dashboard</h4>
+
+    <div class="row g-4">
+
+        <div class="col-md-6 col-lg-4">
+            <div class="card dashboard-card p-4">
+                <div class="dashboard-icon mb-3">🏃</div>
+                <h5 class="fw-bold">Discover Events</h5>
+                <p class="text-muted">
+                    Browse available running, walking and cycling events.
+                </p>
+                <a href="/" class="btn btn-primary mt-auto">
+                    Explore Events
+                </a>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-4">
+            <div class="card dashboard-card p-4">
+                <div class="dashboard-icon mb-3">📝</div>
+                <h5 class="fw-bold">My Enrolments</h5>
+                <p class="text-muted">
+                    Your event enrolment management will be available here.
+                </p>
+                <span class="badge bg-secondary">Coming next</span>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-4">
+            <div class="card dashboard-card p-4">
+                <div class="dashboard-icon mb-3">🏆</div>
+                <h5 class="fw-bold">My Results</h5>
+                <p class="text-muted">
+                    View your race results and performance.
+                </p>
+                <span class="badge bg-secondary">Coming next</span>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-4">
+            <div class="card dashboard-card p-4">
+                <div class="dashboard-icon mb-3">👤</div>
+                <h5 class="fw-bold">My Profile</h5>
+                <p class="text-muted">
+                    View your registered account information.
+                </p>
+                <p class="mb-1"><strong>Name:</strong> @ViewBag.FirstName @ViewBag.LastName</p>
+                <p class="mb-0"><strong>Email:</strong> @ViewBag.Email</p>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="d-flex flex-wrap gap-2 mt-4">
+        <a href="/" class="btn btn-outline-primary">
+            Back to Home
+        </a>
+
+        <form action="/Account/Logout" method="post">
+            @Html.AntiForgeryToken()
+            <button type="submit" class="btn btn-outline-danger">
+                Logout
+            </button>
+        </form>
+    </div>
+
+</div>

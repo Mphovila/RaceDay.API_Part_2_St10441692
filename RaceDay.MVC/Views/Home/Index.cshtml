@@ -1,0 +1,234 @@
+﻿@using System.Text.Json
+
+@{
+    ViewData["Title"] = "RaceDay - Home";
+
+    JsonElement events = JsonSerializer.SerializeToElement(
+        ViewBag.Events ?? Array.Empty<object>()
+    );
+
+    string message = ViewBag.Message as string ?? "";
+}
+
+<style>
+    body {
+        background-color: #f4f6f9;
+        font-family: Arial, sans-serif;
+    }
+
+    .race-header {
+        background: #172554;
+        color: white;
+        padding: 35px;
+        border-radius: 12px;
+        margin-bottom: 35px;
+    }
+
+        .race-header h1 {
+            font-size: 36px;
+            font-weight: bold;
+        }
+
+        .race-header p {
+            color: #dbeafe;
+            margin-bottom: 0;
+        }
+
+    .section-title {
+        color: #172554;
+        font-weight: bold;
+        margin-bottom: 25px;
+    }
+
+    .event-card {
+        background: white;
+        border-radius: 12px;
+        padding: 25px;
+        margin-bottom: 22px;
+        box-shadow: 0 3px 12px rgba(0,0,0,0.07);
+        border-left: 5px solid #2563eb;
+    }
+
+        .event-card h3 {
+            color: #1e40af;
+            font-weight: bold;
+            margin-bottom: 12px;
+        }
+
+    .event-description {
+        color: #666;
+        margin-bottom: 20px;
+    }
+
+    .event-details {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 15px;
+    }
+
+    .detail-label {
+        color: #777;
+        font-size: 13px;
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    .detail-value {
+        color: #172554;
+        font-weight: bold;
+    }
+
+    .event-type {
+        display: inline-block;
+        background: #dbeafe;
+        color: #1e40af;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: bold;
+        margin-bottom: 15px;
+    }
+
+    .empty-message {
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        text-align: center;
+        color: #666;
+    }
+
+    .race-footer {
+        text-align: center;
+        color: #777;
+        margin-top: 45px;
+        padding: 20px;
+    }
+</style>
+
+<div class="container mt-4 mb-5">
+
+    <div class="race-header">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+
+            <div>
+                <h1>RaceDay</h1>
+                <p>Your race. Your challenge. Your finish line.</p>
+            </div>
+
+            <div>
+                @if (Context.Session.GetInt32("UserId") != null)
+                {
+                    <span class="text-white me-3">
+                        Welcome, @Context.Session.GetString("FirstName")
+                    </span>
+
+                    <form action="/Account/Logout" method="post" class="d-inline">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-light">Logout</button>
+                    </form>
+                }
+                else
+                {
+                    <a href="/Account/Login" class="btn btn-outline-light me-2">
+                        Login
+                    </a>
+
+                    <a href="/Account/Register" class="btn btn-light">
+                        Register
+                    </a>
+                }
+            </div>
+
+        </div>
+    </div>
+
+    <h2 class="section-title">Upcoming Events</h2>
+
+    @if (!string.IsNullOrWhiteSpace(message))
+    {
+        <div class="alert alert-warning">@message</div>
+    }
+
+    @if (events.ValueKind == JsonValueKind.Array && events.GetArrayLength() > 0)
+    {
+        @foreach (JsonElement raceEvent in events.EnumerateArray())
+        {
+            if (raceEvent.ValueKind == JsonValueKind.Object)
+            {
+                string eventName = "Race Event";
+                string description = "No description available.";
+                string eventType = "General";
+                string eventDate = "";
+                string location = "Location not specified";
+                string entryFee = "0.00";
+
+                if (raceEvent.TryGetProperty("eventName", out JsonElement name))
+                    eventName = name.ToString();
+
+                if (raceEvent.TryGetProperty("description", out JsonElement desc))
+                    description = desc.ToString();
+
+                if (raceEvent.TryGetProperty("eventType", out JsonElement type))
+                    eventType = type.ToString();
+
+                if (raceEvent.TryGetProperty("eventDate", out JsonElement date))
+                    eventDate = date.ToString();
+
+                if (raceEvent.TryGetProperty("location", out JsonElement place))
+                    location = place.ToString();
+
+                if (raceEvent.TryGetProperty("entryFee", out JsonElement fee))
+                    entryFee = fee.ToString();
+
+                string formattedDate = eventDate;
+
+                if (DateTime.TryParse(eventDate, out DateTime parsedDate))
+                {
+                    formattedDate = parsedDate.ToString("dd MMMM yyyy, HH:mm");
+                }
+
+                <div class="event-card">
+
+                    <span class="event-type">@eventType</span>
+
+                    <h3>@eventName</h3>
+
+                    <p class="event-description">@description</p>
+
+                    <div class="event-details">
+
+                        <div>
+                            <span class="detail-label">Date and Time</span>
+                            <span class="detail-value">@formattedDate</span>
+                        </div>
+
+                        <div>
+                            <span class="detail-label">Location</span>
+                            <span class="detail-value">@location</span>
+                        </div>
+
+                        <div>
+                            <span class="detail-label">Entry Fee</span>
+                            <span class="detail-value">R @entryFee</span>
+                        </div>
+
+                    </div>
+
+                </div>
+            }
+        }
+    }
+    else
+    {
+        <div class="empty-message">
+            <h4>No events available yet.</h4>
+            <p>New RaceDay events will appear here when they are added.</p>
+        </div>
+    }
+
+    <div class="race-footer">
+        <p>© @DateTime.Now.Year RaceDay. All rights reserved.</p>
+    </div>
+
+</div>
+
